@@ -129,8 +129,8 @@ ScreenGui.Name = "FarmGUI"
 ScreenGui.ResetOnSpawn = false
 
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 250, 0, 220) -- Adjusted height to remove extra space
-MainFrame.Position = UDim2.new(0.5, -125, 0.5, -100) -- Centered it in the screen
+MainFrame.Size = UDim2.new(0, 250, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -100)
 MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 MainFrame.BackgroundTransparency = 0.4
 MainFrame.BorderSizePixel = 0
@@ -141,16 +141,16 @@ local MainFrameCorner = Instance.new("UICorner", MainFrame)
 MainFrameCorner.CornerRadius = UDim.new(0, 10)
 
 local MainFrameStroke = Instance.new("UIStroke", MainFrame)
-MainFrameStroke.Color = Color3.fromRGB(0, 255, 255) -- Bright cyan
+MainFrameStroke.Color = Color3.fromRGB(0, 255, 255)
 MainFrameStroke.Thickness = 2
-MainFrameStroke.Transparency = 0.2 -- Lightly transparent
+MainFrameStroke.Transparency = 0.2
 MainFrameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Title Section with Darker Background Box extending to the border
+-- Title Section
 local TitleBox = Instance.new("Frame", MainFrame)
-TitleBox.Size = UDim2.new(1, 0, 0, 40) -- Full width title box
+TitleBox.Size = UDim2.new(1, 0, 0, 40)
 TitleBox.Position = UDim2.new(0, 0, 0, 0)
-TitleBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Light black for the title box
+TitleBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TitleBox.BackgroundTransparency = 0.7
 TitleBox.BorderSizePixel = 0
 local TitleBoxCorner = Instance.new("UICorner", TitleBox)
@@ -160,16 +160,16 @@ local Title = Instance.new("TextLabel", TitleBox)
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Coin & Egg AutoFarm"
-Title.TextColor3 = Color3.fromRGB(255, 0, 0)  -- Start with red
+Title.TextColor3 = Color3.fromRGB(255, 0, 0)
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 22
 Title.TextStrokeTransparency = 0.3
 Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 
--- Grey text box for the toggles and buttons (more transparent)
+-- TextBox for Buttons
 local TextBoxFrame = Instance.new("Frame", MainFrame)
-TextBoxFrame.Size = UDim2.new(1, -20, 0, 90)  -- Adjusted height to fit all buttons
-TextBoxFrame.Position = UDim2.new(0, 10, 0, 45)  -- Below the title
+TextBoxFrame.Size = UDim2.new(1, -20, 0, 90)
+TextBoxFrame.Position = UDim2.new(0, 10, 0, 45)
 TextBoxFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 TextBoxFrame.BackgroundTransparency = 0.5
 TextBoxFrame.BorderSizePixel = 0
@@ -179,7 +179,7 @@ TextBoxFrame.ClipsDescendants = true
 local TextBoxFrameCorner = Instance.new("UICorner", TextBoxFrame)
 TextBoxFrameCorner.CornerRadius = UDim.new(0, 10)
 
--- Helper function to create toggle buttons inside the text box
+-- Toggle Button Creator
 local function createToggle(text, yPosition, settingName)
     local Label = Instance.new("TextLabel", TextBoxFrame)
     Label.Size = UDim2.new(0, 120, 0, 30)
@@ -195,7 +195,7 @@ local function createToggle(text, yPosition, settingName)
 
     local Button = Instance.new("TextButton", TextBoxFrame)
     Button.Size = UDim2.new(0, 40, 0, 30)
-    Button.Position = UDim2.new(0, 140, 0, yPosition)  -- Moved the button closer
+    Button.Position = UDim2.new(0, 140, 0, yPosition)
     Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     Button.BackgroundTransparency = 0.2
     Button.Text = "OFF"
@@ -206,48 +206,45 @@ local function createToggle(text, yPosition, settingName)
     local ButtonCorner = Instance.new("UICorner", Button)
     ButtonCorner.CornerRadius = UDim.new(1, 0)
 
-    -- Smooth toggle button transition
+    -- Local toggle state
+    local currentState = false
+
     Button.MouseButton1Click:Connect(function()
+        currentState = not currentState
+
         if settingName == "CoinFarm" then
-            coin_farming = not coin_farming
+            coin_farming = currentState
         elseif settingName == "EggFarm" then
-            egg_farming = not egg_farming
+            egg_farming = currentState
         elseif settingName == "AntiAFK" then
-            anti_afk = not anti_afk
+            anti_afk = currentState
         end
 
-        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-        local goal = {}
-
-        if coin_farming or egg_farming or anti_afk then
-            goal.Text = "ON"
-            goal.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-            goal.TextColor3 = Color3.fromRGB(255, 255, 255)
-        else
-            goal.Text = "OFF"
-            goal.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            goal.TextColor3 = Color3.fromRGB(255, 80, 80)
-        end
-
-        local tween = TweenService:Create(Button, tweenInfo, goal)
+        local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+        local tween = TweenService:Create(Button, tweenInfo, {
+            BackgroundColor3 = currentState and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(50, 50, 50)
+        })
         tween:Play()
+
+        Button.Text = currentState and "ON" or "OFF"
+        Button.TextColor3 = currentState and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 80, 80)
     end)
 end
 
--- Create toggles inside the grey text box
+-- Create Buttons
 createToggle("Coin Farm", 5, "CoinFarm")
 createToggle("Egg Farm", 35, "EggFarm")
-createToggle("Anti AFK", 65, "AntiAFK")  -- Added Anti AFK toggle
+createToggle("Anti AFK", 65, "AntiAFK")
 
--- Info Line (Added after buttons, outside the text box)
+-- Info Label
 local infoText = Instance.new("TextLabel", MainFrame)
-infoText.Size = UDim2.new(0, 230, 0, 30)  -- Adjusted size to fit text
-infoText.Position = UDim2.new(0.5, -115, 0.85, 0) -- Moved the position a little bit up
+infoText.Size = UDim2.new(0, 230, 0, 30)
+infoText.Position = UDim2.new(0.5, -115, 0.85, 0)
 infoText.BackgroundTransparency = 1
 infoText.Text = "💡 Start Auto Farming By Turning The Buttons - Created By Blox"
 infoText.Font = Enum.Font.GothamBlack
-infoText.TextSize = 14  -- Smaller text size
-infoText.TextColor3 = Color3.fromRGB(255, 255, 0) -- Start with yellow
+infoText.TextSize = 14
+infoText.TextColor3 = Color3.fromRGB(255, 255, 0)
 infoText.TextStrokeTransparency = 0
 infoText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 infoText.TextWrapped = true
@@ -255,11 +252,11 @@ infoText.TextScaled = false
 infoText.RichText = true
 infoText.ZIndex = 10
 
--- Smooth Red <-> Blue Tween Loop for Title
+-- Title Color Tween
 task.spawn(function()
     local colors = {
-        Color3.fromRGB(255, 0, 0),   -- Red
-        Color3.fromRGB(0, 0, 255)    -- Blue
+        Color3.fromRGB(255, 0, 0),
+        Color3.fromRGB(0, 0, 255)
     }
 
     local i = 1
